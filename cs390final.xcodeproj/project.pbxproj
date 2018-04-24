@@ -57,6 +57,16 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		580C56CA208EEE4C006926BC /* model */ = {
+			isa = PBXGroup;
+			children = (
+				58C6BC99208E4C4500BE760B /* MQTTExtension.swift */,
+				58C6BC9B208E530200BE760B /* SFSpeechExtension.swift */,
+				58B72444208EC5D300932CAD /* CaldendarExtension.swift */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
 		589F81A2208E38E000E0334D = {
 			isa = PBXGroup;
 			children = (
@@ -78,7 +88,7 @@
 		589F81AD208E38E100E0334D /* cs390final */ = {
 			isa = PBXGroup;
 			children = (
-				58C6BC98208E4C2600BE760B /* model */,
+				580C56CA208EEE4C006926BC /* model */,
 				589F81AE208E38E100E0334D /* AppDelegate.swift */,
 				589F81B0208E38E100E0334D /* ViewController.swift */,
 				589F81B2208E38E100E0334D /* Main.storyboard */,
@@ -88,16 +98,6 @@
 				589F81B5208E38E100E0334D /* cs390final.xcdatamodeld */,
 			);
 			path = cs390final;
-			sourceTree = "<group>";
-		};
-		58C6BC98208E4C2600BE760B /* model */ = {
-			isa = PBXGroup;
-			children = (
-				58C6BC99208E4C4500BE760B /* MQTTExtension.swift */,
-				58C6BC9B208E530200BE760B /* SFSpeechExtension.swift */,
-				58B72444208EC5D300932CAD /* CaldendarExtension.swift */,
-			);
-			name = model;
 			sourceTree = "<group>";
 		};
 		DA6DBE5AA384B788C3977C7B /* Frameworks */ = {
