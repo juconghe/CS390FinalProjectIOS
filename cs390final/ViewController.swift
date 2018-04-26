@@ -47,7 +47,7 @@ class ViewController: UIViewController {
         calSetup()
         
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -97,10 +97,10 @@ class ViewController: UIViewController {
             switch response.result.action {
             case "welcome":
                 self.speak(text: response.result.fulfillment.speech)
-                self.mqttClient!.publish(self.pubPath, withString: "welcome")
+                self.mqttClient!.publish(self.pubPath, withString: "2")
             case "home":
                 self.speak(text: response.result.fulfillment.speech)
-                self.mqttClient!.publish(self.pubPath, withString: "home")
+                self.mqttClient!.publish(self.pubPath, withString: "0")
             case "schedule":
                 if self.todayEvent != nil {
                     self.speak(text: response.result.fulfillment.speech)
@@ -108,7 +108,7 @@ class ViewController: UIViewController {
                 }
             case "weather_info":
                 self.speak(text: response.result.fulfillment.speech)
-                self.mqttClient!.publish(self.pubPath, withString: "weather")
+                self.mqttClient!.publish(self.pubPath, withString: "1")
             default:
                 self.speak(text: response.result.fulfillment.speech)
             }
