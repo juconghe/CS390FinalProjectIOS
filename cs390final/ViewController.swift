@@ -12,6 +12,7 @@ import CocoaMQTT
 import ApiAI
 import MediaPlayer
 import EventKit
+import SwiftyJSON
 
 class ViewController: UIViewController {
     let host = "io.adafruit.com"
@@ -32,6 +33,9 @@ class ViewController: UIViewController {
     var todayEvent: String?
     
     var mqttClient: CocoaMQTT?
+    
+    var weatherCond :String?
+    var temperature :String?
 
     @IBOutlet weak var connectionStatus: UILabel!
     @IBOutlet weak var micBtn: UIButton!
@@ -45,7 +49,7 @@ class ViewController: UIViewController {
         recognizer!.delegate = self
         micSetup()
         calSetup()
-        
+        getWeather()
     }
     
     override func didReceiveMemoryWarning() {
@@ -126,16 +130,45 @@ class ViewController: UIViewController {
         return ""
     }
     
+    func getWeather() -> String {
+        let url = URL(string: "http://samples.openweathermap.org/data/2.5/weather?zip=01003,us&appid=7ca833e42d6524522643a7a64006d9eb")
+        let req = URLRequest(url: url!)
+        let task = URLSession.shared.dataTask(with: req) { (data, res, err) in
+            if let weatherdata = data {
+                let json = JSON(data: weatherdata)
+                self.weatherCond =  json["weather"].arrayValue[0]["main"].string!
+                let tempKel = json["main"]["temp"].double!
+                self.temperature = String(Int(tempKel - 273.15))
+            }
+        }
+        task.resume()
+        return ""
+    }
+    
     @IBAction func publishHome(_ sender: Any) {
         mqttClient!.publish(self.pubPath, withString: "0")
     }
     @IBAction func publishWeather(_ sender: Any) {
-        mqttClient!.publish(self.pubPath, withString: "1")
+        switch weatherCond! {
+        case "Sunny":
+            mqttClient!.publish(self.pubPath, withString: "1")
+        case "Rain":
+            mqttClient!.publish(self.pubPath, withString: "2")
+        case "Clouds":
+            mqttClient!.publish(self.pubPath, withString: "2")
+        default:
+            mqttClient!.publish(self.pubPath, withString: "1")
+        }
     }
     @IBAction func publishSchedule(_ sender: Any) {
         if self.todayEvent != nil {
+            print(todayEvent!)
             self.mqttClient!.publish(self.calPath, withString: self.todayEvent!)
         }
+    }
+    
+    @IBAction func publishMusic(_ sender: Any) {
+        mqttClient!.publish(self.pubPath, withString: self.getPlayingSong())
     }
     
     @IBAction func microphoneTapped(_ sender: Any) {

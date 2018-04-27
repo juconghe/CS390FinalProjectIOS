@@ -8,7 +8,6 @@
 
 import Foundation
 import EventKit
-import SwiftyJSON
 
 extension ViewController {
     func getTodayEvent() -> String{
@@ -24,14 +23,14 @@ extension ViewController {
         let calendars = eventStore.calendars(for: .event)
         let predicate = eventStore.predicateForEvents(withStart: today, end: tomorrow, calendars: calendars)
         
-        var eventInfo: [Dictionary<String, [String]>] = []
+        var eventInfo = ""
         for event in eventStore.events(matching: predicate) {
             dateFormatter.dateFormat = "hh:mm a"
             let startDateStr = dateFormatter.string(from: event.startDate)
             let endDateStr = dateFormatter.string(from: event.endDate)
-            eventInfo.append([event.title:[startDateStr, endDateStr]])
+            eventInfo += event.title + " "
+            eventInfo += startDateStr + "-" + endDateStr + " "
         }
-        let json = JSON(eventInfo)
-        return json.rawString()!
+        return eventInfo
     }
 }
