@@ -16,7 +16,6 @@ extension ViewController: CocoaMQTTDelegate {
     func mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) {
         if ack == .accept {
             self.connectionStatus.text = "Connected"
-            mqtt.subscribe(sliderPath, qos: CocoaMQTTQOS.qos1)
         }
     }
     

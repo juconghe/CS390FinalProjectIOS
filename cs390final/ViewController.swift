@@ -18,9 +18,7 @@ class ViewController: UIViewController {
     let host = "io.adafruit.com"
     let username = "Jucong"
     let pass = "01a85723468e409bb15488a77efe724c"
-    let sliderPath = "Jucong/feeds/valueslider"
     let pubPath = "Jucong/feeds/publish"
-    let calPath = "Jucong/feeds/caldendar"
     
     let recognizer = SFSpeechRecognizer(locale: Locale.init(identifier: "en-US"))
     var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -101,18 +99,24 @@ class ViewController: UIViewController {
             switch response.result.action {
             case "welcome":
                 self.speak(text: response.result.fulfillment.speech)
-                self.mqttClient!.publish(self.pubPath, withString: "2")
+                self.mqttClient!.publish(self.pubPath, withString: "0" + "0")
             case "home":
                 self.speak(text: response.result.fulfillment.speech)
-                self.mqttClient!.publish(self.pubPath, withString: "0")
+                self.mqttClient!.publish(self.pubPath, withString: "0" + "0")
             case "schedule":
                 if self.todayEvent != nil {
                     self.speak(text: response.result.fulfillment.speech)
-                    self.mqttClient!.publish(self.calPath, withString: self.todayEvent!)
+                    self.mqttClient!.publish(self.pubPath, withString: "4")
                 }
-            case "weather_info":
-                self.speak(text: response.result.fulfillment.speech)
-                self.mqttClient!.publish(self.pubPath, withString: "1")
+            case "weather":
+                self.speak(text: response.result.fulfillment.speech + "\(self.weatherCond!)")
+                self.publishWeatherHelper()
+            case "music":
+                self.speak(text: response.result.fulfillment.speech + self.getPlayingSong())
+                self.mqttClient!.publish(self.pubPath, withString: "5")
+            case "temp":
+                self.speak(text: response.result.fulfillment.speech + "\(self.temperature!) degrees")
+                self.mqttClient!.publish(self.pubPath, withString: "6" + self.temperature!)
             default:
                 self.speak(text: response.result.fulfillment.speech)
             }
@@ -130,7 +134,7 @@ class ViewController: UIViewController {
         return ""
     }
     
-    func getWeather() -> String {
+    func getWeather(){
         let url = URL(string: "http://samples.openweathermap.org/data/2.5/weather?zip=01003,us&appid=7ca833e42d6524522643a7a64006d9eb")
         let req = URLRequest(url: url!)
         let task = URLSession.shared.dataTask(with: req) { (data, res, err) in
@@ -139,36 +143,46 @@ class ViewController: UIViewController {
                 self.weatherCond =  json["weather"].arrayValue[0]["main"].string!
                 let tempKel = json["main"]["temp"].double!
                 self.temperature = String(Int(tempKel - 273.15))
+                self.mqttClient!.publish(self.pubPath, withString: "6" + self.temperature!)
             }
         }
         task.resume()
-        return ""
+    }
+    
+    func publishWeatherHelper()  {
+        switch weatherCond! {
+        case "Sunny":
+            mqttClient!.publish(self.pubPath, withString: "1" + "1")
+        case "Rain":
+            mqttClient!.publish(self.pubPath, withString: "2" + "2")
+        case "Clouds":
+            mqttClient!.publish(self.pubPath, withString: "2" + "2")
+        default:
+            mqttClient!.publish(self.pubPath, withString: "1" + "1")
+        }
     }
     
     @IBAction func publishHome(_ sender: Any) {
-        mqttClient!.publish(self.pubPath, withString: "0")
+        mqttClient!.publish(self.pubPath, withString: "0" + "0")
     }
+    
     @IBAction func publishWeather(_ sender: Any) {
-        switch weatherCond! {
-        case "Sunny":
-            mqttClient!.publish(self.pubPath, withString: "1")
-        case "Rain":
-            mqttClient!.publish(self.pubPath, withString: "2")
-        case "Clouds":
-            mqttClient!.publish(self.pubPath, withString: "2")
-        default:
-            mqttClient!.publish(self.pubPath, withString: "1")
-        }
+        self.publishWeatherHelper()
     }
+    
     @IBAction func publishSchedule(_ sender: Any) {
         if self.todayEvent != nil {
             print(todayEvent!)
-            self.mqttClient!.publish(self.calPath, withString: self.todayEvent!)
+            self.mqttClient!.publish(self.pubPath, withString: "4")
         }
     }
     
     @IBAction func publishMusic(_ sender: Any) {
-        mqttClient!.publish(self.pubPath, withString: self.getPlayingSong())
+        mqttClient!.publish(self.pubPath, withString: "5")
+    }
+    
+    @IBAction func publishTemp(_ sender: Any) {
+        self.mqttClient!.publish(self.pubPath, withString: "6" + self.temperature!)
     }
     
     @IBAction func microphoneTapped(_ sender: Any) {
