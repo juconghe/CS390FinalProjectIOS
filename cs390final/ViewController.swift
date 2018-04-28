@@ -152,13 +152,13 @@ class ViewController: UIViewController {
     func publishWeatherHelper()  {
         switch weatherCond! {
         case "Sunny":
-            mqttClient!.publish(self.pubPath, withString: "1" + "1")
+            mqttClient!.publish(self.pubPath, withString: "7" + "1")
         case "Rain":
-            mqttClient!.publish(self.pubPath, withString: "2" + "2")
+            mqttClient!.publish(self.pubPath, withString: "7" + "2")
         case "Clouds":
-            mqttClient!.publish(self.pubPath, withString: "2" + "2")
+            mqttClient!.publish(self.pubPath, withString: "7" + "2")
         default:
-            mqttClient!.publish(self.pubPath, withString: "1" + "1")
+            mqttClient!.publish(self.pubPath, withString: "7" + "1")
         }
     }
     
